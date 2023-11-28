@@ -216,7 +216,7 @@ def series_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
     inner_product = abs_product if pos_counts > neg_counts else (-1 * abs_product)
 
     if print_counts:
-        plot_histogram(data)
+        #plot_histogram(data)
         print(f"Pos counts: {pos_counts}, Neg counts: {neg_counts}, Abs counts: {abs_counts}")
         print(f"Inner product: {inner_product}")
     if show_circuit:
