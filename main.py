@@ -1,6 +1,7 @@
+#The main file which runs the user interface. To use the scripts, run this.
+
 import pickle
 import numpy as np
-
 from classifier import Classifier
 from q_funcs import series_inner_product
 
@@ -25,7 +26,12 @@ def blank_terminal():
     print("\033c")
 
 def arbitrary():
+    """
+    Allows for the user to classify a vector with arbitrary classes
+    :return:
+    """
     blank_terminal()
+    #First the user inputs training vectors and their classifications
     print("First, input training vectors as either a .pkl file or a list.")
     classifier = None
     input_type = input('Input "pkl" to load a pkl file or "lst" to load a list:\n').strip()
@@ -66,7 +72,7 @@ def arbitrary():
             input_type = input('\nInput "pkl" to load a pkl file or "lst" to load a list\n').strip()
         else:
             input_type = input('\nInput "pkl" to load a pkl file, "lst" to load a list, or "done" to finish:\n').strip()
-
+    #Once the training vectors are all in, the user can input a test vector
     valid = False
     while not valid:
         test_vector = input(
@@ -81,15 +87,21 @@ def arbitrary():
         else:
             print(f"Error - Dimensions of new data do not match previously established dimensions: {classifier.dimensions}")
     show_circuit = input("Would you like to see the resulting circuit? (y/n)\n").lower().strip() == 'y'
-    match = classifier.classify(test_vector, show_circuit=show_circuit, print_counts=True)
+    print_counts = input("Would you like to see the measured counts? (y/n)\n").lower().strip() == 'y'
+    match = classifier.classify(test_vector, show_circuit=show_circuit, print_counts=print_counts)
     print(f"\nBest match: {match}")
     go = input("\nContinue? (y/n)\n").lower().strip()
     return go == 'y'
 
 def single_product():
+    """
+    Allows for the user to calculate the inner product between two vectors
+    :return:
+    """
     blank_terminal()
     vec_1 = None
     vec_2 = None
+    #Input the first vector
     print("Input the first vector as either a .pkl file or a list.")
     while vec_1 is None:
         input_type = input('Input "pkl" to load a pkl file or "lst" to load a list:\n')
@@ -109,6 +121,7 @@ def single_product():
                     'Invalid input. List values must be floats or integers')
         else:
             print("Invalid input.")
+    #Input the second vector
     print("\nInput the second vector as either a .pkl file or a list.")
     while vec_2 is None:
         input_type = input('Input "pkl" to load a pkl file or "lst" to load a list:\n')
@@ -135,7 +148,7 @@ def single_product():
     go = input("\nContinue? (y/n)\n").lower().strip()
     return go == 'y'
 
-
+#The main loop
 if __name__ == '__main__':
     blank_terminal()
     print("Hello. Welcome to the Qiskit-based innper-product approximator.")
@@ -151,7 +164,7 @@ if __name__ == '__main__':
             else:
                 blank_terminal()
                 choice = input(
-                    'What next? Type "ex" to try the example scheduler, "stop" to exit the program, or just hit enter to submit your own training data again.\n').lower().strip()
+                    'What next? Type "classify" to start the classifier, "product" to calculate an inner product, or "stop" to exit the program.\n').lower().strip()
 
         elif choice == 'product':
             go = single_product()
@@ -160,10 +173,10 @@ if __name__ == '__main__':
             else:
                 blank_terminal()
                 choice = input(
-                    'What next? Type "ex" to try the example scheduler, "stop" to exit the program, or just hit enter to submit your own training data again.\n').lower().strip()
+                    'What next? Type "classify" to start the classifier, "product" to calculate an inner product, or "stop" to exit the program.\n').lower().strip()
 
         elif choice != 'stop':
             print("\nInvalid input.")
             choice = input(
-                'Type "ex" to try the example scheduler, "stop" to exit the program, or just hit enter to submit your own training data.\n').lower().strip()
+                'Type "classify" to start the classifier, "product" to calculate an inner product, or "stop" to exit the program.\n').lower().strip()
 
