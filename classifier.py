@@ -1,3 +1,5 @@
+#Defines the Classifier object which allows for vector classification based on inner product comparisons
+
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, Aer, execute
 import math
 from typing import Union, Tuple, Dict
@@ -12,6 +14,12 @@ class Classifier:
         self.dimensions = 2**self.log_dim
         self.train_vecs = {}
     def add_train_data(self, cl: str, vec: Union[list, np.ndarray]):
+        """
+        Adds training data to an existing or new classification
+        :param cl:
+        :param vec:
+        :return:
+        """
         vec = list(vec) + [0] * (self.dimensions - len(vec))
         if cl in self.train_vecs:
             self.train_vecs[cl] = np.add(vec, self.train_vecs[cl])
@@ -20,6 +28,13 @@ class Classifier:
         return self.train_vecs
 
     def classify(self, test_vec: Union[list, np.ndarray], show_circuit: bool = False, print_counts: bool = False)-> str:
+        """
+        Finds the inner product between the test vector and each total training vector to find the best match.
+        :param test_vec:
+        :param show_circuit:
+        :param print_counts:
+        :return:
+        """
         test_vec = test_vec + [0]*(self.dimensions - len(test_vec))
         max_inner = None
         shown = False

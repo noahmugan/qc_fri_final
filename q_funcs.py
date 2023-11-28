@@ -1,3 +1,5 @@
+#Defines the functions which run the inner-product circuit
+
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, Aer, execute
 from qiskit.circuit import Qubit, Clbit
 import math
@@ -8,7 +10,6 @@ import random
 import datetime
 import os
 from pathlib import Path
-
 from qiskit.visualization import plot_histogram
 
 
@@ -21,6 +22,18 @@ def _inner_product(v_1: Union[List[Union[float, int, complex]], np.ndarray],
                    c_out: Clbit,
                    num_qubits: Optional[int] = None
                    )-> None:
+    """
+    Given vectors and their spots in a quantum circuit, it instantiates them into qubit states and performs the inner product test
+    :param v_1:
+    :param v_2:
+    :param qc:
+    :param qr_1:
+    :param qr_2:
+    :param q_out:
+    :param c_out:
+    :param num_qubits:
+    :return:
+    """
     if num_qubits is None:
         qc.initialize(v_1, qr_1, normalize=True)
         qc.initialize(v_2, qr_2, normalize=True)
@@ -39,6 +52,15 @@ def parallel_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
                         show_circuit: Optional[bool] = False,
                         print_counts: Optional[bool] = False
                         )->float:
+    """
+    A function which was meant to run all three inner product tests in parallel. This does not scale well at all. Use the series version.
+    :param v_1:
+    :param v_2:
+    :param names:
+    :param show_circuit:
+    :param print_counts:
+    :return:
+    """
     log_dim = int(math.ceil(np.log2(len(v_1))))
     filled_v_1 = v_1 + [0] * (2 ** log_dim - len(v_1))
     filled_v_2 = v_2 + [0] * (2 ** log_dim - len(v_2))
@@ -134,6 +156,15 @@ def series_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
                         show_circuit: Optional[bool] = False,
                         print_counts: Optional[bool] = False
                         )->float:
+    """
+    Given two vectors, determines the inner product between them
+    :param v_1:
+    :param v_2:
+    :param names:
+    :param show_circuit:
+    :param print_counts:
+    :return:
+    """
     if len(v_1) == 1:
         v_1 += [0]
     if len(v_1) < len(v_2):
@@ -161,6 +192,7 @@ def series_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
     for i in filled_v_2:
         even_exp_v_2 += [i, 0] if i > 0 else [0, -1 * i]
         odd_exp_v_2 += [0, i] if i > 0 else [-1 * i, 0]
+    #Normal inner product test
     _inner_product(
         v_1=filled_v_1,
         v_2=filled_v_2,
@@ -171,6 +203,7 @@ def series_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
         c_out=cr[0],
         num_qubits=log_dim
     )
+    #Even-expanded inner product test
     qc.x(q_out[0]).c_if(cr[0], 1)
     _inner_product(
         v_1=exp_v_1,
@@ -181,6 +214,7 @@ def series_inner_product(v_1: Union[List[Union[float, int]], np.ndarray],
         q_out=q_out[0],
         c_out=cr[1]
     )
+    #Odd-expanded inner product test
     qc.x(q_out[0]).c_if(cr[1], 1)
     _inner_product(
         v_1=exp_v_1,
